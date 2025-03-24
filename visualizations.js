@@ -18,7 +18,7 @@ class CarVisualization {
 
   async loadData() {
     try {
-      const raw = await d3.csv("https://raw.githubusercontent.com/hemanthpranav/IV-MAIN/main/a1-cars.csv");
+      const raw = await d3.csv("https://raw.githubusercontent.com/hemanthpranav/Car-dataset-visualization/main/a1-cars.csv");
       this.data = raw.map(d => ({
         Car: d.Car,
         Manufacturer: d.Manufacturer,
