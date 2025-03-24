@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Data Visualization</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: #E8E1D5;
+            padding: 30px 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .title {
+            color: #424242;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            color: #616161;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .filters {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #424242;
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+        }
+
+        #reset-btn {
+            padding: 8px 15px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .chart-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .chart-container h2 {
+            color: #424242;
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .chart-controls {
+            margin-bottom: 15px;
+        }
+
+        .chart-controls button {
+            margin-right: 10px;
+            padding: 5px 10px;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .dot, .bubble, rect.data-point {
+            transition: all 0.3s ease;
+        }
+
+        .highlighted {
+            stroke: #000;
+            stroke-width: 2px;
+            transform: scale(1.2);
+        }
+
+        .documentation {
+            background-color: white;
+            padding: 30px;
+            margin: 40px auto;
+            max-width: 1000px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .task {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .task img {
+            width: 100%;
+            border: 1px solid #ddd;
+            margin: 15px 0;
+        }
+
+        .interaction-ref {
+            margin-top: 30px;
+        }
+
+        .interaction-ref table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .interaction-ref th, 
+        .interaction-ref td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .example {
+            background: #f8f9fa;
+            padding: 10px;
+            border-left: 3px solid #4285f4;
+            margin-top: 10px;
+        }
+
+        .error {
+            color: red;
+            padding: 20px;
+            background: #ffeeee;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1 class="title">Car Data Visualization System</h1>
+            <p class="subtitle">Exploring vehicle performance metrics through interactive visualizations</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="filters">
+            <div class="filter-group">
+                <label for="manufacturer-filter">Manufacturer</label>
+                <select id="manufacturer-filter" class="filter">
+                    <option value="all">Loading...</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="origin-filter">Origin</label>
+                <select id="origin-filter" class="filter">
+                    <option value="all">Loading...</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="cylinders-filter">Cylinders</label>
+                <select id="cylinders-filter" class="filter">
+                    <option value="all">Loading...</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <button id="reset-btn">Reset Filters</button>
+            </div>
+        </div>
+
+        <div class="charts">
+            <div class="chart-container">
+                <h2>Fuel Efficiency by Manufacturer</h2>
+                <div id="bar-chart"></div>
+            </div>
+            <div class="chart-container">
+                <h2>Horsepower vs MPG</h2>
+                <div id="scatter-plot"></div>
+            </div>
+            <div class="chart-container">
+                <h2>Weight Distribution by Origin</h2>
+                <div id="weight-distribution"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container documentation">
+        <h2>System Documentation</h2>
+        
+        <div class="task">
+            <h3>Task 1: Compare Fuel Efficiency Across Manufacturers</h3>
+            <div class="example">
+                <strong>Objective:</strong> Identify which manufacturers produce the most fuel-efficient vehicles
+            </div>
+            <ol>
+                <li>Use the manufacturer dropdown to select specific brands</li>
+                <li>Click "Sort A-Z" to alphabetize manufacturers</li>
+                <li>Click "Sort by MPG" to rank manufacturers by fuel efficiency</li>
+                <li>Hover over bars to see exact MPG values</li>
+                <li>Click any bar to filter other visualizations to that manufacturer</li>
+            </ol>
+            <div class="example">
+                <strong>Example Analysis:</strong> Sort by MPG to identify the most efficient manufacturers, then click on the top manufacturer to see their vehicles in the other views.
+            </div>
+        </div>
+
+        <div class="task">
+            <h3>Task 2: Analyze Power vs Efficiency Trade-offs</h3>
+            <div class="example">
+                <strong>Objective:</strong> Understand the relationship between engine power (horsepower) and fuel efficiency (MPG)
+            </div>
+            <ol>
+                <li>Brush over points in the scatter plot to select vehicles</li>
+                <li>Selected vehicles will highlight across all views</li>
+                <li>Use the origin filter to compare different regions</li>
+                <li>Note the color coding: American (blue), European (orange), Japanese (green)</li>
+                <li>Click individual points to focus on specific vehicles</li>
+            </ol>
+            <div class="example">
+                <strong>Example Analysis:</strong> Brush over high-MPG, high-horsepower points to find performance-efficient vehicles, then check their weight distribution.
+            </div>
+        </div>
+
+        <div class="task">
+            <h3>Task 3: Examine Weight Distribution by Origin</h3>
+            <div class="example">
+                <strong>Objective:</strong> Compare vehicle weight characteristics across different origins
+            </div>
+            <ol>
+                <li>View the box plots showing weight distribution for each origin</li>
+                <li>The box shows the interquartile range (25th to 75th percentile)</li>
+                <li>The line inside the box represents the median</li>
+                <li>Whiskers show the range (excluding outliers)</li>
+                <li>Dots represent outlier vehicles</li>
+                <li>Click on boxes or outliers to filter other views</li>
+            </ol>
+            <div class="example">
+                <strong>Example Analysis:</strong> Compare American vs Japanese vehicles to see that Japanese cars tend to be lighter with less variation in weight.
+            </div>
+        </div>
+
+        <div class="interaction-ref">
+            <h3>Interaction Reference</h3>
+            <table>
+                <tr>
+                    <th>Interaction</th>
+                    <th>Effect</th>
+                </tr>
+                <tr>
+                    <td>Dropdown Filters</td>
+                    <td>Filters all visualizations simultaneously by selected criteria</td>
+                </tr>
+                <tr>
+                    <td>Click Bar (Manufacturer)</td>
+                    <td>Filters all views to show only vehicles from that manufacturer</td>
+                </tr>
+                <tr>
+                    <td>Brush in Scatter Plot</td>
+                    <td>Selects vehicles within the brushed area and highlights them across views</td>
+                </tr>
+                <tr>
+                    <td>Click Point/Box</td>
+                    <td>Selects specific vehicle(s) and highlights across views</td>
+                </tr>
+                <tr>
+                    <td>Reset Button</td>
+                    <td>Clears all filters and selections</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script src="visualizations.js"></script>
+</body>
+</html>
